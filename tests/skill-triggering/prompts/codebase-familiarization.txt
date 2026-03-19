@@ -1,0 +1,1 @@
+I just joined this project and need to implement a new notification system. Before I start planning anything, I need to understand the codebase — the structure, how to run it, and which parts are relevant to notifications. This is my first time working in this repo.

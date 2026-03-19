@@ -1,0 +1,1 @@
+The validation report found a blocker: the contract between the Collector and Evaluator doesn't handle the 429 rate limit error. The spec says it should retry with exponential backoff but the current implementation just throws. I need to fix this specific issue.

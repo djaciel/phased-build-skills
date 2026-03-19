@@ -1,0 +1,1 @@
+Use exploration-discovery to investigate technical options. The brainstorming synthesis is at .pbs-framework/exploration/brainstorming-synthesis.md and it's approved.

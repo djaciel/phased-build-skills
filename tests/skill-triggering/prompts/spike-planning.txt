@@ -1,0 +1,1 @@
+I'm in the middle of implementing the transaction module and I realized I'm not sure if the Canton JSON API supports batch party allocations. I need to test this before continuing — can you help me define what exactly I need to validate and set up a structured experiment for it?

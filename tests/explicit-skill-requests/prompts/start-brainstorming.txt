@@ -1,0 +1,1 @@
+Use exploration-brainstorming to explore a new project idea. I want to build a portfolio rebalancing tool but I need to think through the problem and scope first.

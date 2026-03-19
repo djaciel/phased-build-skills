@@ -1,0 +1,1 @@
+Use codebase-familiarization to understand this project. I need to add a payments feature and want to scan the codebase before planning anything.

@@ -1,0 +1,1 @@
+All five tasks from phase 2 are done and committed. I need to verify that everything we built actually matches the spec before we close this phase. The spec is at .pbs-framework/phases/phase-02/spec.md. Let's run a full validation.

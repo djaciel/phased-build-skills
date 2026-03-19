@@ -1,0 +1,1 @@
+Use phase-planning to generate the spec and tasks for phase 3. The closure report for phase 2 is at .pbs-framework/phases/phase-02/closure-report.md.

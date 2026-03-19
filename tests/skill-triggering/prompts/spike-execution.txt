@@ -1,0 +1,1 @@
+Discovery identified 3 spikes that need to be validated. The spike specs are already generated at .pbs-framework/exploration/spikes/. I need to execute spike-01 which tests whether the Canton JSON API can handle concurrent party allocations. Let me run the experiment and document the results.

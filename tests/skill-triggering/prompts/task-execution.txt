@@ -1,0 +1,1 @@
+I have the phase 2 spec ready and all tasks are defined. Let me implement task T-03: Create the evaluation service with scoring logic. The task has its context files listed and acceptance criteria defined. I'll start a fresh session for this one.

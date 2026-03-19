@@ -1,0 +1,1 @@
+Both the brainstorming synthesis and discovery synthesis are approved. I have them at .pbs-framework/exploration/brainstorming-synthesis.md and .pbs-framework/exploration/discovery-synthesis.md. Let's generate all the project definition documents so we can start planning phase 1.
