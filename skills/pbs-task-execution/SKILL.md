@@ -126,12 +126,38 @@ Present the report, then WAIT for the human to approve before any commit.
 This applies regardless of perceived simplicity or confidence level.
 </HARD-GATE>
 
+### Step 6: Post-Approval
+
+When the human approves the task report, execute these sub-steps in order:
+
+**6.1:** Update tasks.md — mark this task as completed. Use the language defined in AGENTS.md `framework_language` (e.g., `Estado: completada` for Spanish, `Status: completed` for English).
+
+**6.2:** If significant decisions were made → update the Decision Log (`.pbs-framework/03-decision-log.md`).
+
+**6.3:** If significant tech debt was generated → update the Tech Debt Register (`.pbs-framework/05-tech-debt-register.md`). Create the file if it doesn't exist.
+
+**6.4:** Commit all changes (implementation + doc updates).
+
+**6.5:** Wait for explicit human confirmation before proceeding to the next task.
+
+#### Significant vs Minor
+
+- **Significant:** affects future tasks, changes something in the spec, or modifies a contract between modules → update Decision Log / Tech Debt Register immediately in Step 6.
+- **Minor:** local to this task, does not affect anything outside scope → only report in the task report. Phase-closure will consolidate minor items later.
+
+**Edge cases:**
+- Task with no decisions or tech debt: Step 6 only updates tasks.md and commits.
+- Task with multiple significant decisions: all are documented in Step 6.2.
+- Human rejects the task report: Step 6 does NOT execute. Fix issues and re-report.
+
 ## Common Mistakes
 
 - **Reading files not listed in context** — leads to scope creep and unnecessary coupling. Only read what's in "Archivos de contexto".
 - **Writing tests after code** — violates TDD. The test must fail first, then the implementation makes it pass.
 - **Committing without human review** — the hard gate exists because humans catch what agents miss. Never bypass it.
 - **Modifying shared utilities "while you're there"** — even if the change is correct, it's outside scope. Report it.
+- **Not updating tasks.md after approval** — Step 6.1 is mandatory. The task status must reflect reality.
+- **Not documenting significant decisions** — if a decision affects future tasks or changes the spec, it goes in the Decision Log during Step 6.2, not "later".
 
 ## Red Flags
 
@@ -142,7 +168,7 @@ Signs the agent is about to violate the process — if you catch yourself thinki
 - "Obviously we need this" → Is it in the spec? If not, report it.
 - "The test is too simple to write" → TDD Iron Law applies. Write it.
 - "I need to read more files to understand" → Only files in "Archivos de contexto".
-- "Let me update the Decision Log myself" → Report the decision. Human updates the log.
+- "Let me update the Decision Log myself" → During implementation (Steps 1-5), report the decision only. During Step 6, update the Decision Log for significant decisions (affect future tasks, change spec, modify contracts).
 - "I'll just fix this other bug I found" → Report it in out-of-scope observations.
 
 ## Common Rationalizations
@@ -156,7 +182,7 @@ Signs the agent is about to violate the process — if you catch yourself thinki
 | "I need this utility for my implementation" | If the utility serves only this task, create it in scope. If it's shared, report the need. |
 | "The test would pass anyway" | TDD requires seeing it fail first. No exceptions. |
 | "I'll just commit since everything passes" | HARD GATE: human reviews before commit. Always. |
-| "This decision is obvious" | If it's not in the Decision Log, it's not obvious enough. Report it. |
+| "This decision is obvious" | If it's significant (affects future tasks, changes spec, modifies contracts), update the Decision Log in Step 6. If minor, report it in the task report. |
 
 ## Integration
 
