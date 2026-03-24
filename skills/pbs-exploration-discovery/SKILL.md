@@ -80,6 +80,8 @@ Guide the human through these blocks. Not all blocks apply to every project — 
 - Are there existing skills or rules for your stack worth using?
 - Special environment setup needed?
 - What testing framework?
+- What package manager will you use? (npm/pnpm/yarn/pip/poetry/etc.)
+- What naming convention will you follow? (camelCase/snake_case/PascalCase/etc.)
 
 ### Block 7: Feasibility Validation (Spikes)
 
@@ -149,7 +151,7 @@ Generate `.pbs-framework/exploration/discovery-synthesis.md` with:
 4. **Design decisions** — numbered decisions with context, alternatives, rationale
 5. **Non-functional requirements** — latency, concurrency, availability, security
 6. **Spike results** — table with question, result, time, conclusion
-7. **Dev environment and tools** — AI tool, skills evaluated, setup needed
+7. **Dev environment and tools** — AI tool, skills evaluated, setup needed, code conventions (package manager, naming convention)
 8. **Resolved questions from brainstorming** — mapping of original questions to answers
 9. **Updated technical risks** — risks from brainstorming + new ones discovered
 10. **Next steps → Etapa 1** — what remains before generating definitions
