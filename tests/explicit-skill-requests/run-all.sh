@@ -25,6 +25,7 @@ declare -A SKILL_MAP=(
     ["plan-feature"]="feature-planning"
     ["execute-spike"]="spike-execution"
     ["plan-spike"]="spike-planning"
+    ["add-scope"]="add-scope"
 )
 
 echo "============================================"

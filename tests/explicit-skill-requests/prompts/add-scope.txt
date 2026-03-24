@@ -1,0 +1,1 @@
+Use add-scope to add the new payment processing module. The client needs Stripe integration and it's a big change to the project.

@@ -1,0 +1,1 @@
+We just closed phase 3 and the client called — they need a completely new payment processing module integrated with Stripe. This is a big change that affects the existing architecture, the roadmap needs new phases, and some of our earlier technical decisions about the payment flow might need to be revisited. Let's document this change and figure out what needs to happen.

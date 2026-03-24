@@ -63,6 +63,7 @@ cp -r phased-build-skills/vendor/superpowers/skills/* your-project/.claude/skill
 | pbs-spike-execution | Execute feasibility spikes in dedicated sessions |
 | pbs-codebase-familiarization | Progressive scan of existing codebase |
 | pbs-feature-planning | Lighter planning for features in existing codebases |
+| pbs-add-scope | Add new scope to a project in construction |
 
 ---
 
@@ -225,6 +226,7 @@ For a step-by-step guide covering every stage, human gate, and expected output, 
 | **pbs-fixing-issues** | Stage 2 | Surgical fix for blockers | Review fix diff |
 | **pbs-codebase-familiarization** | Stage -1 | Progressive scan of existing codebase | Validate context map |
 | **pbs-feature-planning** | Stage 1 (light) | Plan feature with Impact Map | Approve impact map + plan |
+| **pbs-add-scope** | Stage 2 | Add new scope to project in construction | Approve scope record + doc updates |
 | superpowers:test-driven-development | Discipline | TDD enforcement | — |
 | superpowers:systematic-debugging | Discipline | 4-phase debugging | — |
 | superpowers:verification-before-completion | Discipline | Evidence before claims | — |
@@ -315,6 +317,10 @@ STAGE 1-2: PLANNING + CONSTRUCTION
 │      ↓                                           │
 │  Same cycle: /pbs-task-execution →               │
 │  /pbs-phase-validation → /pbs-phase-closure      │
+│      ↓                                           │
+│  Scope change mid-project?                       │
+│  └─ /pbs-add-scope → update docs → new phases   │
+│     → back to /pbs-phase-planning                │
 └──────────────────────────────────────────────────┘
 ```
 
@@ -465,6 +471,7 @@ Each template file has a comment at the top explaining which skill generates it 
 | feature-brief.md.template | exploration-brainstorming (lightweight) | `.pbs-framework/features/[name]/feature-brief.md` |
 | impact-map.md.template | feature-planning | `.pbs-framework/features/[name]/impact-map.md` |
 | spike-spec.md.template | exploration-discovery | `.pbs-framework/exploration/spikes/spike-XX-[name].md` |
+| scope-record.md.template | add-scope | `.pbs-framework/scopes/SC-XX-[name]/scope-record.md` |
 
 ---
 
@@ -497,7 +504,9 @@ phased-build-skills/
 │   │   └── SKILL.md
 │   ├── pbs-codebase-familiarization/
 │   │   └── SKILL.md
-│   └── pbs-feature-planning/
+│   ├── pbs-feature-planning/
+│   │   └── SKILL.md
+│   └── pbs-add-scope/
 │       └── SKILL.md
 ├── vendor/
 │   └── superpowers/                    # Bundled Superpowers skills (fallback)

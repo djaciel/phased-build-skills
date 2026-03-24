@@ -386,6 +386,37 @@ Continue with evidence
 
 ---
 
+## Add Scope Cycle (used within any workflow)
+
+When new scope arrives mid-project — business logic changes, large new features, or pivots that require additional phases.
+
+```
+New scope identified (client request, pivot, new requirements)
+        ↓
+pbs-add-scope
+  1. Generate Scope Record (what, why, impact, affected decisions)
+        ↓
+  Human reviews Scope Record → approves
+        ↓
+  2. Inline brainstorming (Blocks 1-3)
+  3. Inline discovery (optional — human decides)
+        ↓
+  4. Update living documents additively
+  5. Add new phases to roadmap
+        ↓
+  Human reviews all updates → approves
+        ↓
+pbs-phase-planning (for the new phases)
+```
+
+**Key rules:**
+- Original exploration docs (`exploration/`) are NEVER modified
+- Completed phases are FROZEN — never touched
+- Living documents get ADDITIVE updates (SC-XX sections)
+- Scope artifacts go to `.pbs-framework/scopes/SC-XX-nombre/`
+
+---
+
 ## When NOT to Use This Framework
 
 | Scenario | What to do instead |
@@ -417,6 +448,9 @@ Continue with evidence
 | After closure | "Closure approved. Let's plan Phase [N+1]." |
 | After context map | "Context map approved." |
 | After impact map | "Impact map and plan approved. Start T-01." |
+| New scope arrives | "We need to add [X] to the project. Let's document the scope change." |
+| After scope record approved | "Scope record approved. Continue with brainstorming." |
+| After add-scope complete | "Scope change approved. Let's plan Phase [N+1]." |
 
 ---
 
