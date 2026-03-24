@@ -35,6 +35,14 @@ Check if `AGENTS.md` already has a `framework_language` field.
 
 This applies ONLY to `.pbs-framework/` documents. Code, READMEs, and project docs follow whatever conventions the project uses.
 
+### Step 1c: Read Code Conventions
+
+Read the Discovery Synthesis Section 7 (Dev environment and tools) for code conventions:
+- **Package manager** — which package manager the project uses (npm/pnpm/yarn/pip/poetry/etc.)
+- **Naming convention** — which naming convention the project follows (camelCase/snake_case/PascalCase/etc.)
+
+Include these in the generated AGENTS.md under the "Convenciones de Código" section, alongside any other project conventions.
+
 ### Step 2: Create Directory Structure
 
 ```
