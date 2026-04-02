@@ -112,6 +112,13 @@ Generate this structured report for the human:
 [Any decisions that should be added to the Decision Log.
 If none: "No new decisions — all implementation followed existing specs."]
 
+### Decision Delta
+[Technical decisions the AI introduced that were NOT explicitly requested in the spec, tasks, or Decision Log.
+If none: "No autonomous technical decisions — all implementation followed existing specs."]
+
+| Decision | What problem it solves | Why not simpler | How to remove/revert | Promote to Decision Log? |
+|----------|----------------------|-----------------|---------------------|------------------------|
+
 ### Out-of-scope observations
 [Anything discovered that belongs to other tasks or future phases.
 If none: "Nothing out of scope observed."]
@@ -124,6 +131,13 @@ If none: "Nothing out of scope observed."]
 Do NOT commit code. The human reviews the diff and the report first.
 Present the report, then WAIT for the human to approve before any commit.
 This applies regardless of perceived simplicity or confidence level.
+
+The human reviews:
+1. The diff — does the code make sense?
+2. The decision delta — are autonomous decisions understood and accepted?
+3. The report — do tests pass, are criteria met?
+
+If the Decision Delta contains entries, the human MUST explicitly approve each autonomous decision before the task is committed.
 </HARD-GATE>
 
 ### Step 6: Post-Approval
@@ -170,6 +184,8 @@ Signs the agent is about to violate the process — if you catch yourself thinki
 - "I need to read more files to understand" → Only files in "Archivos de contexto".
 - "Let me update the Decision Log myself" → During implementation (Steps 1-5), report the decision only. During Step 6, update the Decision Log for significant decisions (affect future tasks, change spec, modify contracts).
 - "I'll just fix this other bug I found" → Report it in out-of-scope observations.
+- "This is standard best practice" → If it wasn't in the spec, report it in Decision Delta.
+- "Everyone does this" → If the human didn't ask for it, it needs visibility.
 
 ## Common Rationalizations
 
@@ -183,6 +199,7 @@ Signs the agent is about to violate the process — if you catch yourself thinki
 | "The test would pass anyway" | TDD requires seeing it fail first. No exceptions. |
 | "I'll just commit since everything passes" | HARD GATE: human reviews before commit. Always. |
 | "This decision is obvious" | If it's significant (affects future tasks, changes spec, modifies contracts), update the Decision Log in Step 6. If minor, report it in the task report. |
+| "It's a well-known pattern" | If it wasn't in the spec, report it in Decision Delta. Best practices still need visibility when they add complexity. |
 
 ## Integration
 
@@ -199,4 +216,4 @@ Signs the agent is about to violate the process — if you catch yourself thinki
 
 **Transitions:**
 - If more tasks remain → next pbs-task-execution (fresh session)
-- If this was the last task → pbs-phase-validation
+- If this was the last task → pbs-pr-hardening

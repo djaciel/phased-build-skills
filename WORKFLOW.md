@@ -26,8 +26,9 @@ Step-by-step guide for using the PBS skills in both scenarios: new projects from
 │                                                             │
 │ Step 4 → pbs-phase-planning                                 │
 │ Step 5 → pbs-task-execution (per task)                      │
-│ Step 6 → pbs-phase-validation                               │
-│ Step 7 → pbs-phase-closure                                  │
+│ Step 6 → pbs-pr-hardening (code review + PR description)    │
+│          ├─ pbs-review-fixes (if findings need resolution)  │
+│ Step 7 → pbs-phase-closure (knowledge sync)                 │
 │          ↓                                                  │
 │ Step 8 → Back to Step 4 for next phase, or DONE             │
 └─────────────────────────────────────────────────────────────┘
@@ -144,7 +145,7 @@ Step-by-step guide for using the PBS skills in both scenarios: new projects from
    - `tasks.md` — ordered tasks with dependencies, context files, validation commands
 3. Review both documents
 
-**Output:** `.pbs-framework/phases/phase-XX/spec.md` + `tasks.md`
+**Output:** `.pbs-framework/phases/phase-XX/spec.md` + `tasks.md` + `tracker-summary.md`
 
 **Human gate:** Approve BOTH spec and tasks before ANY implementation.
 
@@ -178,7 +179,7 @@ Step-by-step guide for using the PBS skills in both scenarios: new projects from
 - [ ] Code matches acceptance criteria
 - [ ] Tests validate criteria (not just exist)
 - [ ] No files outside task scope were touched
-- [ ] No autonomous decisions were made
+- [ ] Decision delta: autonomous decisions understood and accepted
 
 **When done, say:** "Approved. Commit." then "Start T-02." (repeat for each task)
 
@@ -186,34 +187,39 @@ Step-by-step guide for using the PBS skills in both scenarios: new projects from
 
 ---
 
-### Step 6: Phase Validation — `pbs-phase-validation`
+### Step 6: PR Hardening — `pbs-pr-hardening` + `pbs-review-fixes`
 
 **What you do:**
-1. All tasks complete → tell the AI: "Validate this phase."
-2. The AI runs 2-stage validation:
-   - **Stage 1: Spec Compliance** — checks every acceptance criterion, runs all commands
-   - **Stage 2: Code Quality** — only if Stage 1 passes (SOLID, security, test quality)
-3. Review the validation report
+1. All tasks complete → tell the AI: "Harden this phase for PR."
+2. The AI runs adversarial code review:
+   - **Quick-check:** spec compliance (acceptance criteria, validation commands)
+   - **Deep review:** architecture, code quality, testing, security, decision delta review
+3. Generates two files:
+   - `review-report.md` — findings with per-item states (pending/resolved/rejected/deferred)
+   - `pr-description.md` — navigation guide for PR reviewers
+4. Review the findings
 
-**Output:** `.pbs-framework/phases/phase-XX/validation-report.md`
+**Output:** `.pbs-framework/phases/phase-XX/review-report.md` + `pr-description.md`
 
-**Human gate:** Review the report. Decide:
-- Blockers → fix with `pbs-fixing-issues`
-- Tech debt → register in Tech Debt Register
-- Skippable → ignore
+**Human gate:** Review findings. Decide:
+- Critical/Important → resolve with `pbs-review-fixes`
+- Minor → resolve, reject, or defer
+- Clean → proceed to closure
 
-**If blockers found:**
-1. Say: "Fix blocker: [description]"
-2. The AI uses `pbs-fixing-issues` (surgical minimum change)
-3. Review the fix diff → approve
-4. Say: "Re-validate the phase"
-5. The AI re-runs `pbs-phase-validation`
+**If findings need resolution:**
+1. Say: "Resolve the review findings."
+2. The AI uses `pbs-review-fixes` — iterates finding by finding:
+   - **Fix:** implements minimum change, marks resolved
+   - **Reject:** presents reasoning, you confirm
+   - **Defer:** registers as tech debt
+3. You arbitrate each finding — approve, override, or pause
+4. After all findings resolved → review-report status changes to `resolved`
 
-**When clean, say:** "Validation passed. Close the phase."
+**When clean, say:** "Review resolved. Close the phase."
 
 ---
 
-### Step 7: Phase Closure — `pbs-phase-closure`
+### Step 7: Phase Closure (Knowledge Sync) — `pbs-phase-closure`
 
 **What you do:**
 1. The AI generates closure report reflecting REALITY (git log, not plan)
@@ -223,6 +229,8 @@ Step-by-step guide for using the PBS skills in both scenarios: new projects from
    - Tech Debt Register (if new debt)
    - Architecture Snapshot (if structure changed)
 3. Review the closure report and document updates
+
+**Note:** Code quality was already validated by pbs-pr-hardening. Closure focuses on knowledge sync only.
 
 **Output:** `.pbs-framework/phases/phase-XX/closure-report.md` + updated global docs
 
@@ -259,8 +267,8 @@ Step-by-step guide for using the PBS skills in both scenarios: new projects from
 │                                                             │
 │ Step 3 → pbs-feature-planning                               │
 │ Step 4 → pbs-task-execution (per task)                      │
-│ Step 5 → pbs-phase-validation                               │
-│ Step 6 → pbs-phase-closure                                  │
+│ Step 5 → pbs-pr-hardening + pbs-review-fixes                │
+│ Step 6 → pbs-phase-closure (knowledge sync)                 │
 │          ↓                                                  │
 │ Step 7 → Next phase or DONE                                 │
 └─────────────────────────────────────────────────────────────┘
@@ -331,19 +339,38 @@ Step-by-step guide for using the PBS skills in both scenarios: new projects from
 
 Use the same skills as Workflow A:
 - **Step 4:** `pbs-task-execution` per task (review diff → commit)
-- **Step 5:** `pbs-phase-validation` (2-stage review)
-  - Fix blockers with `pbs-fixing-issues` if needed
-- **Step 6:** `pbs-phase-closure` (lighter closure report)
+- **Step 5:** `pbs-pr-hardening` (adversarial review + PR description)
+  - Resolve findings with `pbs-review-fixes` if needed
+- **Step 6:** `pbs-phase-closure` (knowledge sync)
 - **Step 7:** Next phase or DONE
 
-**Key constraint:** "Existing tests still pass" is mandatory in EVERY validation.
+**Key constraint:** "Existing tests still pass" is mandatory in EVERY review.
 
 ---
 
-## Fix Cycle (used within any workflow)
+## Review Fix Cycle (used after PR Hardening)
 
 ```
-pbs-phase-validation finds blocker
+pbs-pr-hardening generates review-report.md with findings
+        ↓
+Human says: "Resolve the review findings."
+        ↓
+pbs-review-fixes (iterate finding by finding)
+  - Fix: implement minimum change → mark resolved
+  - Reject: present reasoning → human confirms → mark rejected
+  - Defer: register as tech debt → mark deferred
+        ↓
+Human arbitrates each finding
+        ↓
+All findings resolved → review-report status: resolved
+        ↓
+Continue to closure
+```
+
+## Surgical Fix Cycle (for ad-hoc blockers)
+
+```
+Blocker found (during review or ad-hoc)
         ↓
 Human says: "Fix blocker: [description]"
         ↓
@@ -351,12 +378,7 @@ pbs-fixing-issues (surgical minimum change)
         ↓
 Human reviews fix diff → approves
         ↓
-Human says: "Re-validate the phase"
-        ↓
-pbs-phase-validation (re-run)
-        ↓
-PASS → continue to closure
-FAIL → repeat fix cycle
+Continue
 ```
 
 ---
@@ -441,10 +463,10 @@ pbs-phase-planning (for the new phases)
 | After definitions | "Definitions are ready. Let's plan Phase 1." |
 | After plan review | "Plan approved. Start T-01." |
 | After each task diff | "Approved. Commit." then "Start T-XX." |
-| After all tasks done | "All tasks done. Validate this phase." |
-| After validation (clean) | "Validation passed. Close the phase." |
-| After validation (blockers) | "Fix blocker: [description]" |
-| After fix | "Re-validate the phase." |
+| After all tasks done | "All tasks done. Harden this phase for PR." |
+| After review (clean) | "Review resolved. Close the phase." |
+| After review (findings) | "Resolve the review findings." |
+| After review fixes | "Review resolved. Close the phase." |
 | After closure | "Closure approved. Let's plan Phase [N+1]." |
 | After context map | "Context map approved." |
 | After impact map | "Impact map and plan approved. Start T-01." |
@@ -461,6 +483,6 @@ These are discipline skills that pbs-skills invoke automatically — you don't n
 | Skill | Used by | Purpose |
 |-------|---------|---------|
 | `test-driven-development` | pbs-task-execution, pbs-fixing-issues | TDD enforcement (test first, always) |
-| `verification-before-completion` | pbs-task-execution, pbs-phase-validation, pbs-codebase-familiarization, pbs-generating-definitions, pbs-phase-closure | Evidence before claims |
+| `verification-before-completion` | pbs-task-execution, pbs-pr-hardening, pbs-review-fixes, pbs-codebase-familiarization, pbs-generating-definitions, pbs-phase-closure | Evidence before claims |
 | `systematic-debugging` | pbs-task-execution (when bugs found) | 4-phase debugging process |
-| `requesting-code-review` | Optional (requires full Superpowers) | Structured review dispatch for critical tasks |
+| `receiving-code-review` | pbs-review-fixes | Technical rigor in responding to review feedback |

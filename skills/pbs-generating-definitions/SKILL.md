@@ -205,6 +205,8 @@ Populate with decisions from the Discovery Synthesis. Every technology choice, A
 - ALL phases exist from day 1 — at minimum: objective + deliverable
 - Only Phase 1 has concrete tasks
 - Each phase should be completable in 1-3 days
+- Each phase MUST be designed as a mergeable unit (PR-shaped) — if a phase can't be described as a single coherent PR with a clear technical narrative, it's too big or too mixed. Split it.
+- The test: "Can a reviewer follow this phase's changes without drowning?" If no → break it down.
 - Phases can be reordered, merged, or dropped as the project evolves
 - 3-6 phases is the sweet spot. Under 3 → probably too coarse. Over 10 → probably too granular.
 

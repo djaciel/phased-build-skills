@@ -1,1 +1,1 @@
-Use phase-closure for phase-02. Validation passed and I want to generate the closure report and update global docs.
+Use phase-closure for phase-02. Review is resolved and I want to generate the closure report and update global docs.

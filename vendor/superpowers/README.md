@@ -7,7 +7,7 @@ These are copies of skills from [Superpowers](https://github.com/obra/superpower
 | Skill | Purpose | Used by |
 |-------|---------|---------|
 | test-driven-development | TDD Iron Law enforcement | pbs-task-execution, pbs-fixing-issues |
-| verification-before-completion | Evidence before claims | pbs-task-execution, pbs-phase-validation, pbs-generating-definitions, pbs-codebase-familiarization, pbs-phase-closure |
+| verification-before-completion | Evidence before claims | pbs-task-execution, pbs-pr-hardening, pbs-review-fixes, pbs-generating-definitions, pbs-codebase-familiarization, pbs-phase-closure |
 | systematic-debugging | 4-phase debugging process | pbs-task-execution (when bugs found), pbs-spike-execution |
 
 ## When to use these vs. full Superpowers

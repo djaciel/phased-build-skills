@@ -43,3 +43,4 @@
 3. Al cerrar una fase, se detalla la siguiente y se reajusta el resto
 4. Las fases esbozadas pueden cambiar de orden, fusionarse o eliminarse
 5. El roadmap se revisa en cada cierre de fase
+6. Cada fase debe ser una unidad entregable (PR-shaped): si un reviewer no puede seguir los cambios de la fase sin ahogarse, la fase es demasiado grande o mezcla demasiados conceptos

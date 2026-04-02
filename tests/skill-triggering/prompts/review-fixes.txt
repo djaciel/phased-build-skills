@@ -1,0 +1,1 @@
+The review report for phase 2 has 2 critical and 3 minor findings pending. I need to go through them one by one and resolve each finding. The report is at .pbs-framework/phases/phase-02/review-report.md.

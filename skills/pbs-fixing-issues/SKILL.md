@@ -1,6 +1,6 @@
 ---
 name: pbs-fixing-issues
-description: "Use when phase validation or code review found blockers that must be fixed with minimal, surgical changes"
+description: "Use when PR hardening or code review found blockers that must be fixed with minimal, surgical changes"
 ---
 
 # Fixing Issues
@@ -23,7 +23,7 @@ NO REFACTORING. NO IMPROVING. JUST FIX THE ISSUE.
 ## Input
 
 - Phase spec: `.pbs-framework/phases/phase-XX/spec.md` (for context)
-- Issue description: from the validation report or code review findings
+- Issue description: from the review report or code review findings
 - Relevant code files: identified from the issue description
 
 ## The Process
@@ -70,7 +70,8 @@ This applies regardless of how obvious the fix appears.
 ## Integration
 
 **Called by:**
-- pbs-phase-validation — for each blocker found
+- pbs-pr-hardening — for critical/important findings requiring surgical fixes
+- pbs-review-fixes — for complex fixes during review resolution
 - Requesting code review — for blockers found in review
 
 **Required skills:**
@@ -78,4 +79,4 @@ This applies regardless of how obvious the fix appears.
 - **REQUIRED:** superpowers:verification-before-completion — verify all validations pass
 
 **After fix:**
-- Re-run pbs-phase-validation to verify the fix didn't break anything else
+- Re-run pbs-pr-hardening if the fix is substantial, or continue with pbs-review-fixes

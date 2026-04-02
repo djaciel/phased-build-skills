@@ -99,7 +99,7 @@ done
 cd "$PROJECT_DIR"
 git init -q
 git add -A
-git commit -q -m "init" --allow-empty
+git -c commit.gpgsign=false commit -q -m "init" --allow-empty
 
 # Run Claude
 LOG_FILE="$OUTPUT_DIR/claude-output.json"
@@ -156,9 +156,9 @@ with open("$LOG_FILE") as f:
                 sk = inp.get("skill", inp.get("command", ""))
                 if sk:
                     skills_found.append(sk)
-                    # Match with or without namespace prefix
+                    # Match with or without namespace prefix and pbs- prefix
                     bare = sk.split(":")[-1] if ":" in sk else sk
-                    if bare == skill_name:
+                    if bare == skill_name or bare == "pbs-" + skill_name:
                         triggered = True
 
 print("TRIGGERED=" + ("true" if triggered else "false"))

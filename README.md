@@ -56,8 +56,9 @@ cp -r phased-build-skills/vendor/superpowers/skills/* your-project/.claude/skill
 | pbs-generating-definitions | Generate all project definition documents |
 | pbs-phase-planning | Plan a construction phase (spec + tasks) |
 | pbs-task-execution | Implement one task with human gate |
-| pbs-phase-validation | 2-stage review against phase spec |
-| pbs-phase-closure | Close phase, update docs, handoff context |
+| pbs-pr-hardening | Adversarial code review + PR description |
+| pbs-review-fixes | Resolve review findings with human arbitration |
+| pbs-phase-closure | Knowledge sync: update docs, handoff context |
 | pbs-fixing-issues | Surgical fix for blockers |
 | pbs-spike-planning | Generate structured spike specs for technical experiments |
 | pbs-spike-execution | Execute feasibility spikes in dedicated sessions |
@@ -138,22 +139,29 @@ You: Good. Start T-02.
 → Repeat for each task...
 ```
 
-### Step 6: Validate the phase
+### Step 6: Harden the phase for PR
 
 ```
-You: All tasks done. Validate this phase.
+You: All tasks done. Harden this phase for PR.
 
-→ AI activates pbs-phase-validation
-→ Stage 1: Checks every acceptance criterion against spec
-→ Stage 2: Code quality review
-→ Presents: validation report with findings
-→ YOU review → fix blockers with /pbs-fixing-issues if needed
+→ AI activates pbs-pr-hardening
+→ Quick-check: spec compliance
+→ Deep review: architecture, code quality, testing, decision deltas
+→ Generates: review-report.md + pr-description.md
+→ YOU review findings
+
+If findings need resolution:
+You: Resolve the review findings.
+
+→ AI activates pbs-review-fixes
+→ Iterates finding by finding (fix/reject/defer)
+→ YOU arbitrate each finding
 ```
 
-### Step 7: Close the phase
+### Step 7: Close the phase (knowledge sync)
 
 ```
-You: Validation passed. Close the phase.
+You: Review resolved. Close the phase.
 
 → AI activates pbs-phase-closure
 → Generates: closure-report.md
@@ -200,7 +208,7 @@ You: Context map approved. Let's plan the notifications feature.
 
 ### Steps 3-6: Same execution cycle
 
-Use `pbs-task-execution` → `pbs-phase-validation` → `pbs-phase-closure` — same as new projects, but lighter (shorter phases, lighter closure reports, always verifying existing tests don't break).
+Use `pbs-task-execution` → `pbs-pr-hardening` → `pbs-review-fixes` (if needed) → `pbs-phase-closure` — same as new projects, but lighter (shorter phases, lighter closure reports, always verifying existing tests don't break).
 
 ---
 
@@ -217,10 +225,11 @@ For a step-by-step guide covering every stage, human gate, and expected output, 
 | **pbs-exploration-brainstorming** | Stage 0 | Structured brainstorming sessions | Approve synthesis |
 | **pbs-exploration-discovery** | Stage 0 | Technical investigation + feasibility | Approve synthesis |
 | **pbs-generating-definitions** | Stage 1 | Generate all .pbs-framework/ documents | Approve all docs (Definition of Ready) |
-| **pbs-phase-planning** | Stage 2 | Plan a phase: spec.md + tasks.md | Approve spec + tasks |
-| **pbs-task-execution** | Stage 2 | Implement one task | Review diff before commit |
-| **pbs-phase-validation** | Stage 2 | 2-stage review against spec | Review validation report |
-| **pbs-phase-closure** | Stage 2 | Close phase, update docs | Validate closure report |
+| **pbs-phase-planning** | Stage 2 | Plan a phase: spec.md + tasks.md + tracker-summary.md | Approve spec + tasks |
+| **pbs-task-execution** | Stage 2 | Implement one task (with decision delta) | Review diff + decision delta before commit |
+| **pbs-pr-hardening** | Stage 2 | Adversarial code review + PR description | Review findings |
+| **pbs-review-fixes** | Stage 2 | Resolve review findings | Arbitrate each finding |
+| **pbs-phase-closure** | Stage 2 | Knowledge sync: close phase, update docs | Validate closure report |
 | **pbs-spike-planning** | Stage 0 / Stage 2 | Generate structured spike specs | Review spike spec |
 | **pbs-spike-execution** | Stage 0 / Stage 2 | Execute spikes in dedicated sessions | Review spike results |
 | **pbs-fixing-issues** | Stage 2 | Surgical fix for blockers | Review fix diff |
@@ -275,12 +284,13 @@ STAGE 2: CONSTRUCTION (repeat per phase)
 │  ├─ Implements code + tests (TDD)                │
 │  └─ [HUMAN GATE: review diff → commit]           │
 │      ↓                                           │
-│  /pbs-phase-validation                            │
-│  ├─ 2-stage: spec compliance + code quality      │
-│  └─ [HUMAN GATE: review report]                  │
+│  /pbs-pr-hardening                                │
+│  ├─ Adversarial code review + PR description     │
+│  ├─ /pbs-review-fixes (if findings need fixing)  │
+│  └─ [HUMAN GATE: review + arbitrate findings]    │
 │      ↓                                           │
 │  /pbs-phase-closure                               │
-│  ├─ Closure report + doc updates                 │
+│  ├─ Knowledge sync + doc updates                 │
 │  └─ [HUMAN GATE: validate closure]               │
 │      ↓                                           │
 │  Roadmap complete? → Yes: DONE / No: next phase  │
@@ -316,7 +326,7 @@ STAGE 1-2: PLANNING + CONSTRUCTION
 │  └─ [HUMAN GATE: approve impact map + plan]      │
 │      ↓                                           │
 │  Same cycle: /pbs-task-execution →               │
-│  /pbs-phase-validation → /pbs-phase-closure      │
+│  /pbs-pr-hardening → /pbs-phase-closure          │
 │      ↓                                           │
 │  Scope change mid-project?                       │
 │  └─ /pbs-add-scope → update docs → new phases   │
@@ -344,14 +354,15 @@ STAGE 1-2: PLANNING + CONSTRUCTION
 └──────┬──────┘
        ▼
 ┌─────────────┐
-│  VALIDATE   │  /pbs-phase-validation
-│             │  Stage 1: spec compliance
-│             │  Stage 2: code quality
-│             │  → [HUMAN REVIEWS REPORT]
+│  HARDEN     │  /pbs-pr-hardening
+│             │  → spec compliance + adversarial review
+│             │  → review-report.md + pr-description.md
+│             │  → /pbs-review-fixes (if findings)
+│             │  → [HUMAN ARBITRATES FINDINGS]
 └──────┬──────┘
        ▼
 ┌─────────────┐
-│  CLOSE      │  /pbs-phase-closure
+│  SYNC       │  /pbs-phase-closure
 │             │  → closure-report.md
 │             │  → update Decision Log, Roadmap
 │             │  → detail next phase
@@ -371,9 +382,10 @@ STAGE 1-2: PLANNING + CONSTRUCTION
 | Discovery synthesis | Are technical decisions sound? | 15-20 min |
 | Definition of Ready | Can you read all docs in < 30 min? No blocking ambiguities? | 20-30 min |
 | Phase plan (spec + tasks) | Acceptance criteria complete? Tasks well-granulated? | 15-20 min |
-| Each task diff + report | Does the code make sense? Tests correct? No autonomous decisions? | 10-15 min |
-| Code review (optional, critical tasks) | Security checks pass? | 15-20 min |
-| Phase validation report | Spec compliance OK? Code quality OK? | 10-15 min |
+| Each task diff + report | Does the code make sense? Tests correct? Decision delta accepted? | 10-15 min |
+| Review report (PR hardening) | Findings accurate? Severity correct? | 15-20 min |
+| Review fixes | Resolutions acceptable? No regressions? | 10-15 min |
+| PR description | Navigable? Decisions documented? | 5-10 min |
 | Phase closure report | Reflects reality? Docs updated correctly? | 10-15 min |
 
 **Total human review time per phase:** ~1.5-2 hours
@@ -440,7 +452,7 @@ This tells the AI agent to follow that skill's rules. The skill must be installe
 
 ### Required (bundled in vendor/)
 - `test-driven-development` — enforced by pbs-task-execution, pbs-fixing-issues
-- `verification-before-completion` — enforced by pbs-task-execution, pbs-phase-validation, pbs-generating-definitions, pbs-codebase-familiarization, pbs-phase-closure
+- `verification-before-completion` — enforced by pbs-task-execution, pbs-pr-hardening, pbs-review-fixes, pbs-generating-definitions, pbs-codebase-familiarization, pbs-phase-closure
 - `systematic-debugging` — used when bugs are found during implementation or spikes
 
 ---
@@ -465,6 +477,9 @@ Each template file has a comment at the top explaining which skill generates it 
 | phase-spec.md.template | phase-planning / feature-planning | `.pbs-framework/phases/phase-XX/spec.md` |
 | phase-tasks.md.template | phase-planning / feature-planning | `.pbs-framework/phases/phase-XX/tasks.md` |
 | closure-report.md.template | phase-closure | `.pbs-framework/phases/phase-XX/closure-report.md` |
+| review-report.md.template | pr-hardening | `.pbs-framework/phases/phase-XX/review-report.md` |
+| tracker-summary.md.template | phase-planning / feature-planning | `.pbs-framework/phases/phase-XX/tracker-summary.md` |
+| pr-description.md.template | pr-hardening | `.pbs-framework/phases/phase-XX/pr-description.md` |
 | brainstorming-synthesis.md.template | exploration-brainstorming | `.pbs-framework/exploration/brainstorming-synthesis.md` |
 | discovery-synthesis.md.template | exploration-discovery | `.pbs-framework/exploration/discovery-synthesis.md` |
 | codebase-context-map.md.template | codebase-familiarization | `.pbs-framework/features/[name]/codebase-context-map.md` |
@@ -492,7 +507,9 @@ phased-build-skills/
 │   │   └── SKILL.md
 │   ├── pbs-task-execution/
 │   │   └── SKILL.md
-│   ├── pbs-phase-validation/
+│   ├── pbs-pr-hardening/
+│   │   └── SKILL.md
+│   ├── pbs-review-fixes/
 │   │   └── SKILL.md
 │   ├── pbs-phase-closure/
 │   │   └── SKILL.md
@@ -525,12 +542,16 @@ phased-build-skills/
 │   ├── phase-spec.md.template
 │   ├── phase-tasks.md.template
 │   ├── closure-report.md.template
+│   ├── review-report.md.template
+│   ├── tracker-summary.md.template
+│   ├── pr-description.md.template
 │   ├── brainstorming-synthesis.md.template
 │   ├── discovery-synthesis.md.template
 │   ├── codebase-context-map.md.template
 │   ├── feature-brief.md.template
 │   ├── impact-map.md.template
-│   └── spike-spec.md.template
+│   ├── spike-spec.md.template
+│   └── scope-record.md.template
 └── tests/
     ├── skill-triggering/
     │   ├── run-test.sh                 # Test one skill with a natural prompt

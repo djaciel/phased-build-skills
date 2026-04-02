@@ -27,6 +27,14 @@ NO IMPLEMENTATION UNTIL HUMAN APPROVES IMPACT MAP + PHASE PLAN.
 
 Planning and coding happen in separate sessions. This skill produces documents only.
 
+## Design Constraint: PR-Shaped Phases
+
+Each phase MUST be designed as a single coherent PR. This means:
+- All tasks in the phase contribute to ONE technical narrative
+- A reviewer can follow the changes without context overload
+- The phase result is explainable in a 2-3 sentence PR description
+- If the phase mixes unrelated concerns, split it — propose multiple phases instead
+
 ## The Process
 
 ### Step 1: Load Context
@@ -206,7 +214,18 @@ Same format as phase-planning tasks, but each task MUST include:
 - **Status:** pending
 ```
 
-### Step 5: Self-Review
+### Step 5: Generate tracker-summary.md
+
+Generate `.pbs-framework/features/[feature-name]/phases/phase-01/tracker-summary.md` using the `tracker-summary.md.template`.
+
+**Rules:**
+- Descriptions MUST be concise and direct — written for PMs and teammates, not for AI agents
+- No technical jargon that requires reading the spec to understand
+- Each task description must be copy-paste ready for Linear, Jira, or similar tools
+- Include estimation as t-shirt size (XS/S/M/L) based on task complexity
+- Include a "Notas para el equipo" section with context a human collaborator would need
+
+### Step 6: Self-Review
 
 Before presenting to the human, verify:
 
@@ -219,8 +238,10 @@ Before presenting to the human, verify:
 - [ ] Every task has a validation command for existing tests
 - [ ] No task touches 4+ output files
 - [ ] The spec's out-of-scope section is explicit
+- [ ] tracker-summary.md describes tasks in plain language a PM can understand
+- [ ] Phase can be described as a single coherent PR — if not, split it
 
-### Step 6: Present to Human
+### Step 7: Present to Human
 
 Present a summary:
 - Impact Map highlights: total files affected (direct + indirect), migration needed (yes/no), tests at risk
@@ -273,8 +294,9 @@ This applies regardless of how simple the feature appears.
 
 **Uses same execution skills as pbs-phase-planning:**
 - pbs-task-execution — to implement each task
-- pbs-phase-validation — to validate each phase against spec
-- pbs-phase-closure — to close each phase with a lightweight closure report
+- pbs-pr-hardening — to review each phase with adversarial code review
+- pbs-review-fixes — to resolve review findings
+- pbs-phase-closure — to close each phase with knowledge sync
 
 **Required skills for tasks:**
 - **REQUIRED:** superpowers:test-driven-development — all tasks follow TDD
