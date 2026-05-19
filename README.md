@@ -65,6 +65,11 @@ cp -r phased-build-skills/vendor/superpowers/skills/* your-project/.claude/skill
 | pbs-codebase-familiarization | Progressive scan of existing codebase |
 | pbs-feature-planning | Lighter planning for features in existing codebases |
 | pbs-add-scope | Add new scope to a project in construction |
+| pbs-pr-review-context | Reviewer enablement: reconstruct PR intent, map files, detect stack, triage complexity |
+| pbs-pr-review-consistency | Search precedents in the codebase with mandatory textual citation |
+| pbs-pr-review-general | Generic quality pass on PR core files; recommends stack-specific best-practices skills manually |
+| pbs-pr-review-security | Lightweight threat model on PR deltas only (not historic debt) |
+| pbs-pr-review-reports | Generate Reviewer Dossier (for the reviewer) and Developer Report (for the PR author, human + LLM-actionable) |
 
 ---
 
@@ -236,6 +241,11 @@ For a step-by-step guide covering every stage, human gate, and expected output, 
 | **pbs-codebase-familiarization** | Stage -1 | Progressive scan of existing codebase | Validate context map |
 | **pbs-feature-planning** | Stage 1 (light) | Plan feature with Impact Map | Approve impact map + plan |
 | **pbs-add-scope** | Stage 2 | Add new scope to project in construction | Approve scope record + doc updates |
+| **pbs-pr-review-context** | Stage R (Review) | Entry point: reconstruct PR intent, map files, triage, review plan | Validate review-context.md |
+| **pbs-pr-review-consistency** | Stage R | Precedent search with textual citation | Review appended findings |
+| **pbs-pr-review-general** | Stage R | Generic quality pass on core files | Review findings + manual best-practices invocations |
+| **pbs-pr-review-security** | Stage R | Threat model the PR deltas | Review security findings |
+| **pbs-pr-review-reports** | Stage R | Reviewer Dossier + Developer Report | Read dossier before sharing with author |
 | superpowers:test-driven-development | Discipline | TDD enforcement | — |
 | superpowers:systematic-debugging | Discipline | 4-phase debugging | — |
 | superpowers:verification-before-completion | Discipline | Evidence before claims | — |
@@ -372,6 +382,40 @@ STAGE 1-2: PLANNING + CONSTRUCTION
   Next phase or DONE
 ```
 
+### PR Review (Workflow C: review a teammate's PR)
+
+The `pbs-pr-review-*` family helps a reviewer revise an external PR without spending 1-2 days reading code. Parallel to Workflow A (new project) and Workflow B (existing codebase). See [WORKFLOW.md](WORKFLOW.md) for the detailed orchestration.
+
+```
+STAGE R: REVIEWER ENABLEMENT
+┌──────────────────────────────────────────────────┐
+│  /pbs-pr-review-context                           │
+│  ├─ git diff <base>...<branch>                   │
+│  ├─ Map files, detect stack, reconstruct intent  │
+│  ├─ Triage (chico/mediano/grande/sensible)       │
+│  └─ Output: review-context.md + review plan      │
+│      ↓ [HUMAN GATE: validate context]            │
+│                                                  │
+│  MVP path: → /pbs-pr-review-reports              │
+│            → reviewer-dossier.md (minimal)       │
+│                                                  │
+│  Full path (per review plan):                    │
+│  /pbs-pr-review-consistency (precedent search)   │
+│  /pbs-pr-review-general (quality, tests)         │
+│  /pbs-pr-review-security (threat model deltas)   │
+│  ├─ All append to findings.md (no overwrite)     │
+│  └─ Schema: severity + confidence + evidence     │
+│      ↓ [HUMAN GATE: review findings.md]          │
+│                                                  │
+│  /pbs-pr-review-reports                           │
+│  ├─ reviewer-dossier.md (for the reviewer)       │
+│  ├─ developer-report.md (for the PR author)      │
+│  └─ [HUMAN GATE: read dossier before sharing]    │
+└──────────────────────────────────────────────────┘
+```
+
+**Symmetry with pbs-pr-hardening:** `pbs-pr-hardening` helps the AUTHOR harden their own PR before opening it. `pbs-pr-review-*` helps the REVIEWER revise an external PR. Both sides of the peer review loop are AI-assisted; the human decides in both.
+
 ---
 
 ## Human Gates Summary
@@ -487,6 +531,9 @@ Each template file has a comment at the top explaining which skill generates it 
 | impact-map.md.template | feature-planning | `.pbs-framework/features/[name]/impact-map.md` |
 | spike-spec.md.template | exploration-discovery | `.pbs-framework/exploration/spikes/spike-XX-[name].md` |
 | scope-record.md.template | add-scope | `.pbs-framework/scopes/SC-XX-[name]/scope-record.md` |
+| pr-review-context.md.template | pbs-pr-review-context | `.pbs-framework/reviews/<branch-slug>/review-context.md` |
+| pr-review-reviewer-dossier.md.template | pbs-pr-review-reports | `.pbs-framework/reviews/<branch-slug>/reviewer-dossier.md` |
+| pr-review-developer-report.md.template | pbs-pr-review-reports | `.pbs-framework/reviews/<branch-slug>/developer-report.md` |
 
 ---
 
@@ -523,7 +570,17 @@ phased-build-skills/
 │   │   └── SKILL.md
 │   ├── pbs-feature-planning/
 │   │   └── SKILL.md
-│   └── pbs-add-scope/
+│   ├── pbs-add-scope/
+│   │   └── SKILL.md
+│   ├── pbs-pr-review-context/
+│   │   └── SKILL.md
+│   ├── pbs-pr-review-consistency/
+│   │   └── SKILL.md
+│   ├── pbs-pr-review-general/
+│   │   └── SKILL.md
+│   ├── pbs-pr-review-security/
+│   │   └── SKILL.md
+│   └── pbs-pr-review-reports/
 │       └── SKILL.md
 ├── vendor/
 │   └── superpowers/                    # Bundled Superpowers skills (fallback)
@@ -551,7 +608,10 @@ phased-build-skills/
 │   ├── feature-brief.md.template
 │   ├── impact-map.md.template
 │   ├── spike-spec.md.template
-│   └── scope-record.md.template
+│   ├── scope-record.md.template
+│   ├── pr-review-context.md.template
+│   ├── pr-review-reviewer-dossier.md.template
+│   └── pr-review-developer-report.md.template
 └── tests/
     ├── skill-triggering/
     │   ├── run-test.sh                 # Test one skill with a natural prompt

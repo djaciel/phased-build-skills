@@ -1,0 +1,1 @@
+This PR adds a new payment webhook endpoint plus some validation logic. The review context is already done and it's flagged as sensitive. I want a focused security pass on just what this PR introduces — auth checks, input validation, error leakage, idempotency, secrets. Don't tell me about existing problems in the repo, only what this PR changes.

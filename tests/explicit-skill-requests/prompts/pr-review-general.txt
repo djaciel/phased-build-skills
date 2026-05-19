@@ -1,0 +1,1 @@
+Use pr-review-general on the review at .pbs-framework/reviews/feat-onramp-validation/. Append general quality findings to findings.md and list any best-practices skills I should run manually afterwards.

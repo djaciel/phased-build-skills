@@ -1,0 +1,1 @@
+I already built the review context and ran a couple of review passes that left findings. Now I need the actual reports — one I can read myself to decide if this PR is ready, and one I can send to my teammate that authored it so they can iterate fixes with their own agent. Don't merge them, the audiences are different.

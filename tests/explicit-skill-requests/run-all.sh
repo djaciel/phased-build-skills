@@ -27,6 +27,11 @@ declare -A SKILL_MAP=(
     ["execute-spike"]="spike-execution"
     ["plan-spike"]="spike-planning"
     ["add-scope"]="add-scope"
+    ["pr-review-context"]="pr-review-context"
+    ["pr-review-reports"]="pr-review-reports"
+    ["pr-review-consistency"]="pr-review-consistency"
+    ["pr-review-general"]="pr-review-general"
+    ["pr-review-security"]="pr-review-security"
 )
 
 echo "============================================"

@@ -348,6 +348,167 @@ Use the same skills as Workflow A:
 
 ---
 
+## Workflow C: PR Review (review a teammate's PR)
+
+Workflow A and B help an AUTHOR build and harden a PR. Workflow C helps a REVIEWER understand and review a PR somebody else opened, without spending 1-2 days reading code blindly. Same principle: AI assists, the human decides.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ STAGE R: REVIEWER ENABLEMENT                                │
+│                                                             │
+│ Step 1 → pbs-pr-review-context                              │
+│          ├─ branch + base (gh optional for PR metadata)     │
+│          ├─ git diff <base>...<branch> local                │
+│          ├─ Map files, detect stack, reconstruct intent     │
+│          ├─ Triage: chico / mediano / grande / sensible     │
+│          └─ Output: review-context.md + review plan         │
+│                                                             │
+│ Branch by triage and review plan:                           │
+│                                                             │
+│ MVP path (chico, low-stakes):                               │
+│ Step 2 → pbs-pr-review-reports                              │
+│          → reviewer-dossier.md (minimal: synthesis +        │
+│            manual review guide)                             │
+│          → SHARE manually with the team / use as your map   │
+│                                                             │
+│ Full path (mediano / grande / sensible):                    │
+│ Step 2a → pbs-pr-review-consistency                         │
+│           (precedent search, textual citation required)     │
+│ Step 2b → pbs-pr-review-general                             │
+│           (quality, tests vs intent, recommend best-prac)   │
+│ Step 2c → pbs-pr-review-security                            │
+│           (threat model the deltas only)                    │
+│           ↓                                                 │
+│           findings.md (appended by each pass, no overwrite) │
+│           ↓                                                 │
+│ Step 3 → pbs-pr-review-reports                              │
+│          ├─ reviewer-dossier.md (for the reviewer)          │
+│          └─ developer-report.md (for the PR author,         │
+│             human + LLM-actionable sections)                │
+│                                                             │
+│ Step 4 → SHARE the developer-report.md (or pieces of it)    │
+│          with the PR author manually. No bot comments.      │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Step 1: Build Review Context — `pbs-pr-review-context`
+
+**What you do:**
+1. Make sure the branch is fetched locally (`git fetch` if needed)
+2. Tell the AI: "Build review context for branch `<branch>` against `<base>`."
+3. The AI runs `git diff <base>...<branch>`, maps files, detects stack, reconstructs intent, applies triage, and produces a review plan
+4. Optionally provide a PR URL / number if `gh` is installed — improves intent reconstruction
+
+**Output:** `.pbs-framework/reviews/<branch-slug>/review-context.md`
+
+**Human gate:** Validate the file classification, the reconstructed intent, and especially the triage classification.
+
+**Triage rules (decided by the skill):**
+- **chico** = ≤5 files without sensitive logic
+- **mediano** = 6-20 files without sensitive logic
+- **grande** = >20 files without sensitive logic
+- **sensible** = touches auth, pagos, datos sensibles, migraciones, permisos, jobs, queues, integraciones externas, contratos, wallets, tokens, balances. Sensible always wins over file count.
+
+**When done, say:** "Context approved. [Run reports for the MVP path / Run consistency / general / security per the plan]."
+
+---
+
+### Step 2 (MVP path): Generate Minimal Dossier — `pbs-pr-review-reports`
+
+**Use when:** triage is `chico` or the review plan marks all specialized passes as `skip`/`shallow`.
+
+**What you do:**
+1. Tell the AI: "Generate the reviewer dossier from the context."
+2. The AI produces only the Reviewer Dossier (no Developer Report — there are no findings to send the author yet)
+
+**Output:** `.pbs-framework/reviews/<branch-slug>/reviewer-dossier.md`
+
+**Human gate:** Read the dossier. Decide if you want to escalate to specialized passes or stop here.
+
+---
+
+### Step 2a: Consistency Pass — `pbs-pr-review-consistency`
+
+**What you do:**
+1. Tell the AI: "Run pbs-pr-review-consistency on this review."
+2. The AI searches the codebase for precedents (types, fields, utilities, functions, schemas) that the PR may be duplicating or diverging from
+3. **Findings require textual citation** of the precedent (file:line + snippet). Without citation → review-question, not finding
+4. Appends findings to `findings.md` (never overwrites)
+
+**Output:** Findings appended to `.pbs-framework/reviews/<branch-slug>/findings.md`
+
+**Human gate:** Review the appended findings and review-questions. Demote, edit, or remove as needed.
+
+**When done, say:** "Consistency done. [Run general / security / generate reports]."
+
+---
+
+### Step 2b: General Quality Pass — `pbs-pr-review-general`
+
+**What you do:**
+1. Tell the AI: "Run pbs-pr-review-general."
+2. The AI inspects core files for: over/under-engineering, dead code, DRY violations, weak tests, missing edge cases
+3. Compares tests against the reconstructed intent
+4. Detects stack and recommends manual invocation of best-practices skills (typescript-best-practices, nodejs-best-practices, etc.) — **does NOT invoke them**
+
+**Output:** Findings + a "Recomendado correr manualmente" section appended to `findings.md`
+
+**Human gate:** Review the findings AND the recommended best-practices list. Decide which best-practices skills to run manually.
+
+**When done, say:** "General done. [Run security / generate reports]."
+
+---
+
+### Step 2c: Security Pass — `pbs-pr-review-security`
+
+**Use when:** triage is `sensible`, OR the PR introduces endpoints / auth / external calls / persisted data / jobs / crypto / secrets.
+
+**What you do:**
+1. Tell the AI: "Run pbs-pr-review-security."
+2. The AI builds a lightweight threat model on the PR DELTAS only — not historic debt
+3. Checklist: input validation, authn/authz, error leakage, data exposure, secrets/tokens, idempotency, external calls
+4. Findings with textual citation; suspicions → review-questions
+
+**Output:** Findings appended to `findings.md`
+
+**Human gate:** Review the security findings carefully. Sensible PRs deserve manual confirmation.
+
+**When done, say:** "Security done. Generate the reports."
+
+---
+
+### Step 3: Generate Reports — `pbs-pr-review-reports`
+
+**What you do:**
+1. Tell the AI: "Generate the reports."
+2. The AI consumes `review-context.md` + `findings.md` and produces:
+   - **Reviewer Dossier** — synthesis, manual review guide, P0/P1 findings elevated, review-questions, verdict, P2/info in appendix
+   - **Developer Report** — human section (findings explained) + LLM-actionable section (copy-paste prompts per finding)
+
+**Output:**
+- `.pbs-framework/reviews/<branch-slug>/reviewer-dossier.md`
+- `.pbs-framework/reviews/<branch-slug>/developer-report.md`
+
+**Human gate:** READ the Reviewer Dossier in full BEFORE sharing the Developer Report or commenting on the PR. The Dossier is yours. The Developer Report is what the author sees.
+
+---
+
+### Step 4: Share with the Author
+
+**No bots, no inline comments.** Open the PR in your provider (GitHub / GitLab / Bitbucket), comment with the verdict + acciones sugeridas, and share the `developer-report.md` with the author (pasted, attached, or linked).
+
+The author runs their own agent with the LLM-actionable prompts to iterate fixes — or fixes manually. The next iteration of the PR can be re-reviewed by re-running pbs-pr-review-context (it re-bases on the new diff).
+
+### Key Rules of Workflow C
+
+- **No bot comments on the PR.** Output is local markdown files. Sharing is manual.
+- **No auto-fix.** The skills never modify the reviewed repo.
+- **Sin evidencia no hay finding.** Every finding requires a textual citation. Suspicions become review-questions.
+- **The review plan is the contract.** Specialized passes respect `full` / `shallow` / `skip` from `review-context.md`.
+- **Symmetry with pbs-pr-hardening.** Hardening is for the author of their own PR. Review is for someone else's PR. Both AI-assisted, both human-decided.
+
+---
+
 ## Review Fix Cycle (used after PR Hardening)
 
 ```
@@ -473,6 +634,12 @@ pbs-phase-planning (for the new phases)
 | New scope arrives | "We need to add [X] to the project. Let's document the scope change." |
 | After scope record approved | "Scope record approved. Continue with brainstorming." |
 | After add-scope complete | "Scope change approved. Let's plan Phase [N+1]." |
+| Starting a PR review | "Build review context for branch `<branch>` against `<base>`." |
+| After context approved (MVP) | "Context approved. Generate the minimal dossier with pbs-pr-review-reports." |
+| After context approved (full) | "Context approved. Run pbs-pr-review-consistency / general / security per the review plan." |
+| After each review pass | "Pass done. Run the next one." (consistency / general / security) |
+| After all passes done | "All passes done. Generate the reports." |
+| After dossier reviewed | "Dossier reviewed. Sharing the developer report with the author." |
 
 ---
 
