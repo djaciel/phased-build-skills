@@ -1,0 +1,1 @@
+Use pr-review-consistency on the current review at .pbs-framework/reviews/feat-onramp-validation/. Find precedents in the codebase and append findings to findings.md. Don't report anything you can't cite textually.
