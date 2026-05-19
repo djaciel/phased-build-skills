@@ -1,0 +1,1 @@
+The review context is ready. Now I want a general quality pass on the core files of this PR: anything over-engineered, dead code, weak tests against what the PR is supposed to do, missing error handling. Don't run stack-specific best-practices skills — just tell me which ones I should run manually later.
