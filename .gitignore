@@ -1,0 +1,11 @@
+# PBS framework workspace — auditoria personal, no producto del repo
+.pbs-framework/
+
+# Brainstormings y notas locales
+context.md
+contextv2.md
+docs/
+
+# OS / editor
+.DS_Store
+*.swp
